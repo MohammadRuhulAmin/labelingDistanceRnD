@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/css/ol.css" type="text/css">
+    <style>
+      html, body, .map {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.2/proj4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/build/ol.js"></script>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+
+      var map = new ol.Map({
+        target: 'map',
+        layers: [
+          
+        ],
+        view: new ol.View()
+      });
+
+      var data = { "type": "MultiPolygon", 
+      "coordinates": [ [ [ 
+       [2875370.689553291071206, 4920425.686579301021993 ],
+       [ 3875368.243538830429316, 520426.618963065557182 ],
+       [ 4875365.849673743359745, 6920427.678083536215127 ],
+       [ 6875370.689553291071206, 4920425.686579301021993 ]
+       ]]] };
+
+      var geometry = new ol.format.GeoJSON().readGeometry(data);
+
+      map.addLayer(
+        new ol.layer.Vector({
+          source: new ol.source.Vector({
+            features: [new ol.Feature(geometry)]
+          })
+        })
+      );
+
+      map.getView().fit(geometry);
+      console.log(data)
+      function distanceCalculation(geojson){
+
+      }
+      // function to add label : 
+      function displayLabel(coordx,coordy){
+            var utm = "+proj=utm +zone=32";
+            var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+            var coord = proj4(utm,wgs84,[coordx, coordy])
+            var labelFeature = new ol.Feature({
+                geometry: new ol.geom.Point([coordx,coordy]),
+            });
+            var labelonly = new ol.style.Style({
+                text: new ol.style.Text({
+                    font: '14px sans-serif',
+                    text: `${parseInt(coordx)},${parseInt(coordy)}`,
+                    fill: new ol.style.Fill({
+                        color: 'red'
+                    }),
+                })
+            });
+            labelFeature.setStyle(labelonly);
+            var vectorSource = new ol.source.Vector({
+                features: [labelFeature]
+            });
+
+            var vectorLayer = new ol.layer.Vector({
+                source: vectorSource
+            });
+            
+            map.addLayer(
+                new ol.layer.Vector({
+                    source: vectorSource
+                })
+            );
+        }
+       const coordinateSet = data.coordinates[0][0];
+      
+       for(let i = 0;i<coordinateSet.length;i++){
+            displayLabel(coordinateSet[i][0],coordinateSet[i][1]);
+       }
+    </script>
+  </body>
+</html>
