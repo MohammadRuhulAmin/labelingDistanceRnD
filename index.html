@@ -46,14 +46,14 @@
       map.getView().fit(geometry);
       
       // getting distance 
-     
+      const coordinateDistance = [];
       function designDistance(){
         const length = data.coordinates[0][0].length;
-        var coordinateDistance = [];
+        
           for(let i = 1;i<length;i++){
               var coord = data.coordinates[0][0];
               var dist = distance(coord[i-1][0],coord[i][0],coord[i-1][1],coord[i][1]);
-              coordinateDistance.push(dist);  
+              coordinateDistance.push(dist);
           }
           coordinateDistance.push(distance(coord[length-1][0],coord[0][0],coord[length-1][1],coord[0][1]));
           
@@ -64,23 +64,22 @@
          return Math.sqrt(  Math.pow((x1-x2),2)+ Math.pow((y1-y2),2));
       }
       // mid point of coordinates 
+      const midPointArray = [];
       function midPointOfCoordinates(){
         let coord = data.coordinates[0][0];
-        let midPointArray = [];
+       
         for(let i = 1;i<coord.length;i++){
           let midx = (coord[i-1][0] + coord[i][0])/2;
           let midy = (coord[i-1][1] + coord[i][1])/2;
           midPointArray.push([midx,midy]);
         }
         midPointArray.push([(coord[0][0] + coord[coord.length - 1][0])/2,(coord[0][1] + coord[coord.length-1][1])/2]);
-        for(let i = 0;i<midPointArray.length;i++){
-          console.log(midPointArray[i]);
-        }
+        
       }
       midPointOfCoordinates();
       
       // function to add label : 
-      function displayLabel(coordx,coordy){
+      function displayLabel(coordx,coordy,distance){
             var utm = "+proj=utm +zone=32";
             var wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
             var coord = proj4(utm,wgs84,[coordx, coordy])
@@ -90,7 +89,9 @@
             var labelonly = new ol.style.Style({
                 text: new ol.style.Text({
                     font: '14px sans-serif',
-                    text: `${parseInt(coordx)},${parseInt(coordy)}`,
+                    offsetY: -25,
+                    //text: `${parseInt(coordx)},${parseInt(coordy)}`,
+                    text:`${parseInt(distance)} km`,
                     fill: new ol.style.Fill({
                         color: 'red'
                     }),
@@ -113,9 +114,14 @@
         }
        const coordinateSet = data.coordinates[0][0];
       
-       for(let i = 0;i<coordinateSet.length;i++){
-            displayLabel(coordinateSet[i][0],coordinateSet[i][1]);
+      //  for(let i = 0;i<coordinateSet.length;i++){
+      //       displayLabel(coordinateSet[i][0],coordinateSet[i][1]);
+      //  }
+       for(let i = 0;i<midPointArray.length;i++){
+          console.log(midPointArray[i][0],midPointArray[i][1])
+          displayLabel(midPointArray[i][0]+4,midPointArray[i][1]+4, coordinateDistance[i]/1000);
        }
+       
     </script>
   </body>
 </html>
